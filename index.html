@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Saber - Tecnología e Informática 5°</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .question-card { display: none; }
+        .question-card.active { display: block; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 p-6 text-white text-center">
+            <h1 class="text-2xl font-bold italic">Prueba Saber de Tecnología</h1>
+            <p class="text-blue-100 mt-2">Grado Quinto - Evaluación de Competencias</p>
+        </div>
+
+        <!-- Intro Screen -->
+        <div id="intro-screen" class="p-8 text-center">
+            <h2 class="text-xl font-semibold mb-4">Instrucciones</h2>
+            <p class="text-gray-600 mb-6 text-left">
+                Esta prueba consta de 20 preguntas de selección múltiple sobre:
+                <ul class="text-left list-disc list-inside text-gray-600 mb-6 ml-4">
+                    <li>Evolución tecnológica.</li>
+                    <li>Impacto en la vida cotidiana.</li>
+                    <li>Innovación actual y futura.</li>
+                    <li>Mantenimiento y buenas prácticas.</li>
+                </ul>
+                Lee atentamente cada pregunta y selecciona la respuesta correcta. Al finalizar obtendrás tu nota final.
+            </p>
+            <button onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition duration-300">
+                Comenzar Prueba
+            </button>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="hidden p-8">
+            <div class="mb-4 flex justify-between items-center text-sm font-medium text-gray-500">
+                <span id="progress-text">Pregunta 1 de 20</span>
+                <span id="timer" class="text-blue-600"></span>
+            </div>
+            
+            <div class="w-full bg-gray-200 h-2 rounded-full mb-8">
+                <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 5%"></div>
+            </div>
+
+            <div id="questions-wrapper">
+                <!-- Questions will be injected here by JavaScript -->
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <button id="next-btn" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition duration-300">
+                    Siguiente
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden p-10 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Resultado Final</h2>
+            <div class="mb-6">
+                <div id="score-circle" class="inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-blue-500 text-3xl font-bold text-blue-600 mb-4">
+                    4.5
+                </div>
+                <p id="stats-text" class="text-gray-600 text-lg"></p>
+            </div>
+            <div id="feedback-message" class="p-4 rounded-lg mb-6 text-white font-semibold"></div>
+            <button onclick="location.reload()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded transition duration-300">
+                Reiniciar Prueba
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            // EJE 1: EVOLUCIÓN (5 Preguntas)
+            {
+                q: "¿Cuál fue el principal material utilizado por el ser humano para crear herramientas durante la Edad de Piedra?",
+                options: ["Plástico", "Piedra y madera", "Acero inoxidable", "Aluminio"],
+                correct: 1
+            },
+            {
+                q: "Durante la Edad de los Metales, el descubrimiento de la fundición permitió crear herramientas de:",
+                options: ["Cobre, Bronce e Hierro", "Vidrio y cerámica", "Papel y cartón", "Fibra de vidrio"],
+                correct: 0
+            },
+            {
+                q: "¿Qué invento de la Edad Media ayudó a que los libros se pudieran producir más rápido y llegaran a más personas?",
+                options: ["El Internet", "La Imprenta de tipos móviles", "La pluma fuente", "El telégrafo"],
+                correct: 1
+            },
+            {
+                q: "La Revolución Industrial, que cambió la forma de fabricar productos usando máquinas, pertenece a la Edad:",
+                options: ["Contemporánea", "Piedra", "Moderna", "Media"],
+                correct: 2
+            },
+            {
+                q: "El desarrollo de computadoras, smartphones e Internet es característico de la Edad:",
+                options: ["Contemporánea", "Antigua", "De los Metales", "Industrial"],
+                correct: 0
+            },
+            // EJE 2: IMPACTO COTIDIANO (5 Preguntas)
+            {
+                q: "¿Cómo ha impactado la tecnología en la comunicación actual?",
+                options: ["Ahora es más lenta que antes", "Ya nadie se comunica", "Permite comunicación instantánea a largas distancias", "Solo se puede usar para jugar"],
+                correct: 2
+            },
+            {
+                q: "En el transporte, ¿cuál de estos avances tecnológicos permite llegar a un destino desconocido sin perderse?",
+                options: ["El motor de vapor", "El GPS (Sistema de Posicionamiento Global)", "La rueda de madera", "El espejo retrovisor"],
+                correct: 1
+            },
+            {
+                q: "¿Qué beneficio principal ofrece la tecnología en la educación actual?",
+                options: ["Permite acceder a mucha información e investigar", "Evita que los niños tengan que leer", "Sirve para no ir nunca a la escuela", "Reemplaza completamente a los profesores"],
+                correct: 0
+            },
+            {
+                q: "En el hogar, la tecnología ha ayudado a que las tareas domésticas sean:",
+                options: ["Más difíciles y peligrosas", "Más rápidas y sencillas gracias a los electrodomésticos", "Imposibles de realizar", "Exactamente igual que hace 500 años"],
+                correct: 1
+            },
+            {
+                q: "¿Qué impacto negativo puede tener el uso excesivo de tecnología en la salud?",
+                options: ["Mejora la visión automáticamente", "Puede causar sedentarismo y problemas de postura", "Hace que crezcamos más rápido", "No tiene ningún impacto negativo"],
+                correct: 1
+            },
+            // EJE 3: INNOVACIÓN ACTUAL Y FUTURA (5 Preguntas)
+            {
+                q: "¿Qué es la Inteligencia Artificial (IA)?",
+                options: ["Un robot que limpia la casa", "Un programa de computadora que no piensa", "Sistemas que imitan procesos de inteligencia humana para realizar tareas", "Un tipo de batería de larga duración"],
+                correct: 2
+            },
+            {
+                q: "¿Cuál de estas es una innovación tecnológica para proteger el medio ambiente?",
+                options: ["Motores que usan más carbón", "Paneles solares para generar energía limpia", "Bolsas de plástico que no se degradan", "Lámparas de aceite"],
+                correct: 1
+            },
+            {
+                q: "¿Qué tecnología futura permitirá imprimir objetos en 3D, incluso órganos humanos o casas?",
+                options: ["Realidad Aumentada", "Impresión 3D avanzada", "Bluetooth", "Cinta magnética"],
+                correct: 1
+            },
+            {
+                q: "La tecnología que nos permite ver objetos digitales encima de nuestra realidad física se llama:",
+                options: ["Televisión a color", "Radiofrecuencia", "Realidad Aumentada", "Microscopio"],
+                correct: 2
+            },
+            {
+                q: "En el futuro, se espera que los automóviles sean autónomos. Esto significa que:",
+                options: ["Volverán a usar caballos", "Podrán conducirse solos sin intervención humana", "Serán más lentos que una bicicleta", "Solo funcionarán con control remoto"],
+                correct: 1
+            },
+            // EJE 4: BUENAS PRÁCTICAS Y MANTENIMIENTO (5 Preguntas)
+            {
+                q: "¿Cuál es la mejor forma de limpiar la pantalla de una tableta o computador?",
+                options: ["Con mucha agua y jabón de loza", "Con un paño suave y seco, o productos específicos", "Con una esponja metálica para quitar la grasa", "No se debe limpiar nunca"],
+                correct: 1
+            },
+            {
+                q: "Para proteger un dispositivo de virus y robos de información, debemos:",
+                options: ["Compartir la contraseña con todos", "Entrar a cualquier link que nos envíen", "Tener un antivirus y usar contraseñas seguras", "Dejar el equipo encendido siempre"],
+                correct: 2
+            },
+            {
+                q: "¿Qué práctica ayuda a cuidar la batería de tu celular o portátil?",
+                options: ["Dejarlo cargando 3 días seguidos", "Evitar que el dispositivo se caliente demasiado", "Usar el cargador de cualquier otro aparato aunque no encaje bien", "Esperar a que se apague solo siempre"],
+                correct: 1
+            },
+            {
+                q: "Cuando usamos Internet, una 'buena práctica' de comportamiento es:",
+                options: ["Publicar fotos de otras personas sin permiso", "Tratar a los demás con respeto y no compartir noticias falsas", "Insultar a quienes piensan diferente", "Dar nuestra dirección a desconocidos"],
+                correct: 1
+            },
+            {
+                q: "¿Por qué es importante apagar o reiniciar los equipos de vez en cuando?",
+                options: ["Para que no se gasten los botones", "Para que el sistema se limpie y funcione mejor", "Para que el equipo descanse y duerma", "No sirve para nada"],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function startQuiz() {
+            document.getElementById('intro-screen').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            renderQuestions();
+            showQuestion(0);
+        }
+
+        function renderQuestions() {
+            const wrapper = document.getElementById('questions-wrapper');
+            questions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = `question-card q-${index}`;
+                div.innerHTML = `
+                    <h3 class="text-xl font-semibold mb-6 text-gray-800">${index + 1}. ${q.q}</h3>
+                    <div class="space-y-3">
+                        ${q.options.map((opt, i) => `
+                            <label class="block p-4 border-2 border-gray-100 rounded-lg cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all">
+                                <input type="radio" name="q${index}" value="${i}" class="mr-3 h-4 w-4 text-blue-600">
+                                <span class="text-gray-700">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                wrapper.appendChild(div);
+            });
+        }
+
+        function showQuestion(index) {
+            document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.q-${index}`).classList.add('active');
+            
+            document.getElementById('progress-text').innerText = `Pregunta ${index + 1} de 20`;
+            document.getElementById('progress-bar').style.width = `${((index + 1) / 20) * 100}%`;
+            
+            if (index === questions.length - 1) {
+                document.getElementById('next-btn').innerText = "Finalizar Prueba";
+            }
+        }
+
+        function nextQuestion() {
+            const selected = document.querySelector(`input[name="q${currentQuestion}"]:checked`);
+            
+            if (!selected) {
+                alert("Por favor selecciona una respuesta antes de continuar.");
+                return;
+            }
+
+            if (parseInt(selected.value) === questions[currentQuestion].correct) {
+                score++;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+                showQuestion(currentQuestion);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            // Calcular nota de 1.0 a 5.0
+            // Formula: (aciertos / total) * 4 + 1
+            const finalGrade = ((score / questions.length) * 4 + 1).toFixed(1);
+            
+            const scoreCircle = document.getElementById('score-circle');
+            scoreCircle.innerText = finalGrade;
+            
+            document.getElementById('stats-text').innerText = `Acertaste ${score} de ${questions.length} preguntas.`;
+
+            const feedback = document.getElementById('feedback-message');
+            if (finalGrade >= 4.6) {
+                feedback.innerText = "¡NIVEL SUPERIOR! Eres un experto en tecnología.";
+                feedback.className = "p-4 rounded-lg mb-6 text-white font-semibold bg-green-500";
+                scoreCircle.className = scoreCircle.className.replace('text-blue-600', 'text-green-600').replace('border-blue-500', 'border-green-500');
+            } else if (finalGrade >= 4.0) {
+                feedback.innerText = "¡NIVEL ALTO! Muy buen trabajo, conoces bien los temas.";
+                feedback.className = "p-4 rounded-lg mb-6 text-white font-semibold bg-blue-500";
+            } else if (finalGrade >= 3.0) {
+                feedback.innerText = "¡NIVEL BÁSICO! Has aprobado, pero puedes repasar más.";
+                feedback.className = "p-4 rounded-lg mb-6 text-white font-semibold bg-yellow-500";
+                scoreCircle.className = scoreCircle.className.replace('text-blue-600', 'text-yellow-600').replace('border-blue-500', 'border-yellow-500');
+            } else {
+                feedback.innerText = "NIVEL BAJO. Te recomendamos estudiar los temas nuevamente.";
+                feedback.className = "p-4 rounded-lg mb-6 text-white font-semibold bg-red-500";
+                scoreCircle.className = scoreCircle.className.replace('text-blue-600', 'text-red-600').replace('border-blue-500', 'border-red-500');
+            }
+        }
+    </script>
+</body>
+</html>
